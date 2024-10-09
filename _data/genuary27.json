@@ -1,0 +1,17 @@
+{
+    "description": {
+        "ar": "وصف العينة",
+        "el": "Περιγραφή δείγματος",
+        "en": "Sample Description"
+    },
+    "teaser": {
+        "ar": "تيزر عينة",
+        "el": "Δείγμα Teaser",
+        "en": "Sample Teaser"
+    },
+    "title": {
+        "ar": "عنوان العينة",
+        "el": "Δείγμα τίτλου",
+        "en": "Sample Title"
+    }
+}
