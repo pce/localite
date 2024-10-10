@@ -32,35 +32,40 @@ jobs:
             cpp_compiler: clang++
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set reusable strings
-      id: strings
-      shell: bash
-      run: |
-        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+      - name: Install vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          ./vcpkg/bootstrap-vcpkg.sh # For Linux/macOS
+          # Windows will use vcpkg.exe directly, no need for a special command
 
-    - name: Install Dependencies
-      run: sudo apt-get install -y cmake  # Add platform-specific installs if needed
+      - name: Set reusable strings
+        id: strings
+        shell: bash
+        run: |
+          echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+          echo "vcpkg-root=${{ github.workspace }}/vcpkg" >> "$GITHUB_OUTPUT"
 
-    - name: Configure CMake
-      run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -S ${{ github.workspace }}
+      - name: Configure CMake
+        run: |
+          cmake -B ${{ steps.strings.outputs.build-output-dir }} \
+          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
+          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+          -DCMAKE_TOOLCHAIN_FILE=${{ steps.strings.outputs.vcpkg-root }}/scripts/buildsystems/vcpkg.cmake \
+          -S ${{ github.workspace }}
 
-    - name: Build
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+      - name: Build
+        run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
-    - name: Test
-      working-directory: ${{ steps.strings.outputs.build-output-dir }}
-      run: ctest --build-config ${{ matrix.build_type }}
+      - name: Test
+        working-directory: ${{ steps.strings.outputs.build-output-dir }}
+        run: ctest --build-config ${{ matrix.build_type }}
 
-    - name: Upload release assets
-      if: github.event_name == 'release'
-      uses: actions/upload-artifact@v3
-      with:
-        name: Localite-${{ matrix.os }}-${{ matrix.build_type }}
-        path: ${{ steps.strings.outputs.build-output-dir }}/  # Adjust if necessary
+      - name: Upload release assets
+        if: github.event_name == 'release'
+        uses: actions/upload-artifact@v3
+        with:
+          name: Localite-${{ matrix.os }}-${{ matrix.build_type }}
+          path: ${{ steps.strings.outputs.build-output-dir }}/

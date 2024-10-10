@@ -37,6 +37,15 @@ In the fonts folder the original Files are converted to C++ byte array.
 
 ## Build
 
+
+    cmake -B build \
+    -DCMAKE_TOOLCHAIN_FILE=path/to/vcpkg/scripts/buildsystems/vcpkg.cmake \
+    -S .
+
+
+
+### Notes
+
 vcpkg might be unable to determine target architecture.  
 Consider providing a value for the CMAKE_OSX_ARCHITECTURES cache variable:
 
