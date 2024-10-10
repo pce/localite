@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <string_view>
+#include <utility>
 #include <vector>
 // GLFW for OpenGL GLuint not #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -22,16 +23,17 @@ class ContentBufferView
 {
 public:
     ContentBufferView() : currentPath(fs::current_path()){};
-    ContentBufferView(fs::path projectDirectory)
+    explicit ContentBufferView(fs::path projectDirectory)
     {
-        currentPath = projectDirectory;
+        currentPath = std::move(projectDirectory);
+        SetProjectDirectory(projectDirectory);
     };
     // set project dir
     void Draw(std::string_view label);
     void SetProjectDirectory(fs::path projectDir);
 
 private:
-    fs::path projectDirectory = "./data";
+    fs::path projectDirectory = "./";
     fs::path currentPath;
     fs::path selectedEntry;
     bool renameDialogOpen = false;

@@ -45,6 +45,11 @@ void FileUtils::OpenFile(const fs::path &filePath)
     std::system(command.c_str());
 }
 
+bool FileUtils::PathExists(const fs::path &path)
+{
+    return fs::exists(path);
+}
+
 std::optional<json> FileUtils::ReadMetadataFromFile(const std::string &filePath)
 {
     // metadata file path (e.g., document.txt.metadata)

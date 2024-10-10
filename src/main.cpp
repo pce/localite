@@ -56,8 +56,24 @@ void render(ContentBufferView &window_obj)
     window_obj.Draw("Content Browser");
 }
 
-int main(int, char **)
+int main(int argc, char **argv)
 {
+    fs::path projectdir = "./";
+    // fs::path projectdir = fs::current_path();
+    std::cout << projectdir.string() << std::endl;
+    if (argc > 1) {
+        fs::path arg1 = argv[1];
+        if (FileUtils::PathExists(arg1)) {
+            projectdir = arg1;
+            std::cout << "Project directory set to: " << projectdir << std::endl;
+        } else {
+            std::cerr << "Provided path does not exist: " << arg1 << std::endl;
+            return 1;
+        }
+    } else {
+        std::cout << "No project directory provided." << std::endl;
+    }
+
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
@@ -120,10 +136,10 @@ int main(int, char **)
     // Load embedded font from memory and Map Unicode characters to icons (File, Folders Icons etc.)
     ImFontConfig icon_font_config;
     icon_font_config.MergeMode = true; // Merge the icon font with the default font
-    static const ImWchar icon_ranges[] = {0xE000, 0xF8FF, 0}; // Unicode range for icons
+    static constexpr ImWchar icon_ranges[] = {0xE000, 0xF8FF, 0}; // Unicode range for icons
     io.Fonts->AddFontFromMemoryTTF(OpenFontIcons_ttf, OpenFontIcons_ttf_len, iconSize, &icon_font_config, icon_ranges);
 
-    ContentBufferView window_obj{"./"};
+    ContentBufferView window_obj{projectdir};
 
     ImPlot::CreateContext();
 
