@@ -24,13 +24,22 @@ void ContentBufferView::Draw(std::string_view label)
 
     ImGui::BeginChild("Sidebar", ImVec2(320, 0), true);
 
-    if (ImGui::Button("Go Up"))
+    if (currentPath.has_parent_path())
     {
-        if (currentPath.has_parent_path())
+        if (ImGui::ArrowButton("MoveUp", ImGuiDir_Up))
         {
             currentPath = currentPath.parent_path();
         }
     }
+    else
+    {
+        if (ImGui::ArrowButton("MoveNone", ImGuiDir_Right))
+        {
+            ;//
+        }
+    }
+
+
     ImGui::SameLine();
     ImGui::Text("Path: %s", currentPath.string().c_str());
 
