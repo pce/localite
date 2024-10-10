@@ -34,11 +34,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install vcpkg
+      # Install system dependencies only for Linux (ubuntu-latest)
+      - name: Install system dependencies (Linux only)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libxinerama-dev \
+            libxcursor-dev \
+            xorg-dev \
+            libglu1-mesa-dev \
+            pkg-config
+
+      # Install vcpkg on Linux/macOS
+      - name: Install vcpkg on Linux/macOS
+        if: matrix.os != 'windows-latest'
         run: |
           git clone https://github.com/microsoft/vcpkg.git
-          ./vcpkg/bootstrap-vcpkg.sh # For Linux/macOS
-          # Windows will use vcpkg.exe directly, no need for a special command
+          ./vcpkg/bootstrap-vcpkg.sh
+
+      # Install vcpkg on Windows
+      - name: Install vcpkg on Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          .\vcpkg\bootstrap-vcpkg.bat
+          .\vcpkg\vcpkg.exe install glad
+        shell: cmd  # Use Windows cmd for running the bat file
 
       - name: Set reusable strings
         id: strings
@@ -47,7 +69,16 @@ jobs:
           echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
           echo "vcpkg-root=${{ github.workspace }}/vcpkg" >> "$GITHUB_OUTPUT"
 
-      - name: Configure CMake
+      # Configure CMake on Windows
+      - name: Configure CMake on Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          cmake -B ${{ steps.strings.outputs.build-output-dir }} -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_TOOLCHAIN_FILE=${{ steps.strings.outputs.vcpkg-root }}\scripts\buildsystems\vcpkg.cmake -S ${{ github.workspace }}
+        shell: cmd
+
+      # Configure CMake on Linux/macOS
+      - name: Configure CMake on Linux/macOS
+        if: matrix.os != 'windows-latest'
         run: |
           cmake -B ${{ steps.strings.outputs.build-output-dir }} \
           -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
