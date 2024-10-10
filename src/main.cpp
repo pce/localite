@@ -13,6 +13,7 @@
 #include <GLFW/glfw3.h>
 
 #include "ContentBufferView.hpp"
+#include "open_font_icons.hpp" 
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1900) && \
     !defined(IMGUI_DISABLE_WIN32_FUNCTIONS)
@@ -115,21 +116,22 @@ int main(int, char **)
     ImGuiIO &io = ImGui::GetIO();
     float iconSize = 12.f;
     
-    // Map Unicode characters to icons (File, Folders Icons etc.)
     io.Fonts->AddFontDefault(); //  default font to cover regular characters
-    static const ImWchar icon_ranges[] = {0xE000, 0xF8FF, 0}; // Unicode range of icon font
+    // Load embedded font from memory and Map Unicode characters to icons (File, Folders Icons etc.)
     ImFontConfig icon_font_config;
-    icon_font_config.MergeMode = true; // merge icon font with the default font
-    io.Fonts->AddFontFromFileTTF("./fonts/OpenFontIcons.ttf", iconSize, &icon_font_config, icon_ranges);
+    icon_font_config.MergeMode = true; // Merge the icon font with the default font
+    static const ImWchar icon_ranges[] = {0xE000, 0xF8FF, 0}; // Unicode range for icons
+    io.Fonts->AddFontFromMemoryTTF(OpenFontIcons_ttf, OpenFontIcons_ttf_len, iconSize, &icon_font_config, icon_ranges);
 
     ContentBufferView window_obj{"./"};
+
+    ImPlot::CreateContext();
 
     while (!glfwWindowShouldClose(window))
     {
         start_cycle();
 
         ImGui::NewFrame();
-        ImPlot::CreateContext();
         render(window_obj);
         ImGui::Render();
 

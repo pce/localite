@@ -16,6 +16,14 @@ Prototype of a local Content Browser
 - Browse Files
   - Preview Images
 
+
+# Font 
+
+In the fonts folder the original Files are converted to C++ byte array.  
+ 
+    xxd -i OpenFontIcons.ttf open_font_icons.hpp
+
+
 ## Make
 
     mkdir build && cd build
