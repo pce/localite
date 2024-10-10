@@ -74,6 +74,39 @@ void ContentBufferView::Draw(std::string_view label)
             ImGui::Text("Selected file: %s", selectedEntry.string().c_str());
         }
 
+        if (ImGui::Button("Create directory"))
+        {
+            mkdirDialogOpen = true;
+            ImGui::OpenPopup("Create Directory");
+        }
+        ImGui::SameLine();
+        // ********** mkdir popup
+        if (ImGui::BeginPopupModal("Create Directory", &mkdirDialogOpen))
+        {
+            static char bufferName[512] = "";
+            ImGui::Text("Directory name: ");
+            ImGui::InputText("###NEWNAME", bufferName, IM_ARRAYSIZE(bufferName));
+
+            if (ImGui::Button("Create"))
+            {
+                auto targetPath = currentPath / bufferName;
+                if (FileUtils::CreatePath(targetPath))
+                {
+                    mkdirDialogOpen = false;
+                    currentPath = targetPath;  // Move into the new directory
+                    std::memset(bufferName, 0, sizeof(bufferName));
+                }
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel"))
+            {
+                mkdirDialogOpen = false;
+            }
+
+            ImGui::EndPopup();
+        }
+
         if (fs::is_regular_file(selectedEntry))
         {
             if (ImGui::Button("Open"))
@@ -125,6 +158,7 @@ void ContentBufferView::Draw(std::string_view label)
                         std::memset(bufferName, 0, sizeof(bufferName));
                     }
                 }
+
                 ImGui::EndPopup();
             }
             // ************* delete popup

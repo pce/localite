@@ -50,6 +50,12 @@ bool FileUtils::PathExists(const fs::path &path)
     return fs::exists(path);
 }
 
+bool FileUtils::CreatePath(const fs::path &path)
+{
+    return fs::create_directories(path);
+}
+
+
 std::optional<json> FileUtils::ReadMetadataFromFile(const std::string &filePath)
 {
     // metadata file path (e.g., document.txt.metadata)

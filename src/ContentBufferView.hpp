@@ -38,6 +38,7 @@ private:
     fs::path selectedEntry;
     bool renameDialogOpen = false;
     bool deleteDialogOpen = false;
+    bool mkdirDialogOpen = false;
 
     MediaPreview mediaPreview;
     FileUtils fileUtils;
