@@ -1,3 +1,4 @@
+[![CMake on multiple platforms](https://github.com/pce/localite/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/pce/localite/actions/workflows/cmake-multi-platform.yml)
 
 Prototype of a local Content Browser
 
